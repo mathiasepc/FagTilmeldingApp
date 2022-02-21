@@ -1,4 +1,5 @@
-﻿using FagTilmeldingApp.Codes;
+﻿//Her er interation
+using FagTilmeldingApp.Codes;
 
 Console.WriteLine("Angiv skole?");
 
