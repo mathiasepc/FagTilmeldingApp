@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace FagTilmeldingApp.Codes
 {
-    //Sealed betyder det er den sidste i nedarving
+    //Sealed betyder det er den sidste i nedarving.
+    //Semester : School betyder at Semester er en nedarving af School.
     internal sealed class Semester : School
     {
         string SemesterNavn { get; set; }
