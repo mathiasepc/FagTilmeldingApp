@@ -29,11 +29,17 @@ Console.WriteLine("Angiv skole?");
 
 string? skole = Console.ReadLine();
 
-Console.WriteLine("Angiv forløb?");
+Console.WriteLine("Angiv hovedforløb?");
 
-string? fag = Console.ReadLine();
+string? semesterNavn = Console.ReadLine();
 
-Semester semester = new(skole, fag);
+Console.WriteLine("Angiv uddannelseslinje");
+
+string? uddannelsesLinje = Console.ReadLine();
+
+Semester semester = new(skole, semesterNavn);
+
+semester.SetUddannelseslinje(uddannelsesLinje);
 
 Console.Clear();
 
@@ -44,7 +50,7 @@ while (true)
     Console.Clear();
     Console.ForegroundColor = ConsoleColor.Green;
     Console.WriteLine("---------------------------------------");
-    Console.WriteLine($"{skole}, {fag} forløb tilmelding app");
+    Console.WriteLine($"{semester.SchoolName}, {semester.UddannelsesLinje}, {semester.SemesterNavn} fag tilmelding app");
     Console.WriteLine("---------------------------------------");
     Console.ForegroundColor = ConsoleColor.White;
 
@@ -66,17 +72,18 @@ while (true)
         StudentModel displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.Id);
 
         Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"{errorMessage}");
+        if (errorMessage != null)
+        {
+            Console.WriteLine($"{errorMessage}");
+        }
         Console.ForegroundColor = ConsoleColor.White;
         //nulstiller errorMessage
         errorMessage = null;
-
-        Console.WriteLine();
         
         if (displayElev != null && displayFag != null)
             Console.WriteLine($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Course}");
-        Console.WriteLine();
     }
+    Console.WriteLine("---------------------------------------");
 
     bool succes = false;
     while (!succes)
@@ -102,15 +109,6 @@ while (true)
                 {
                     //tilføjer svaret til min liste.
                     listEnrollment.Add(new Enrollment() { Id = listEnrollment.Count() + 1, FagId = v.FagID, ElevId = v.ElevID });
-
-                    Console.WriteLine("");
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    CourseModel displayFag = listCourses.FirstOrDefault(a => a.Id == v.FagID);
-                    StudentModel displayElev = listStudents.FirstOrDefault(a => a.Id == v.ElevID);
-                    errorMessage = ($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Course}.");
-                    Console.WriteLine($"{errorMessage}");
-                    Console.WriteLine("");
-                    Console.ReadKey();
                 }
             }
             else
