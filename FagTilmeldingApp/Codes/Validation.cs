@@ -16,7 +16,7 @@ namespace FagTilmeldingApp.Codes
         {
             bool succes = int.TryParse(fagID, out int result);
             if (!succes)
-                Console.WriteLine("Det indtastede FagID er forkert format.");
+               ErrorMessage = "Det indtastede fagID er forkert format.";
             else
             {
                 CourseModel? fagId = listCourses.FirstOrDefault(a => a.Id == result);
@@ -37,7 +37,7 @@ namespace FagTilmeldingApp.Codes
         {
             bool succes = int.TryParse(elevID, out int result);
             if (!succes)
-                return succes;
+                 ErrorMessage = "Det indtastede elevID er forkert format";
             else
             {
                 StudentModel? studentId = listStudents.FirstOrDefault(a => a.Id == result);

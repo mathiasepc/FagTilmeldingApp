@@ -1,4 +1,4 @@
-﻿//Her er interation
+﻿
 string errorMessage = null;
 
 List<TeacherModel> listTeachers = new()
@@ -24,7 +24,6 @@ List<StudentModel> listStudents = new()
 
 List<Enrollment> listEnrollment = new();
 
-
 Console.WriteLine("Angiv skole?");
 
 string? skole = Console.ReadLine();
@@ -38,8 +37,36 @@ Console.WriteLine("Angiv uddannelseslinje");
 string? uddannelsesLinje = Console.ReadLine();
 
 Semester semester = new(skole, semesterNavn);
+semester.SetUddannelsesLinje(uddannelsesLinje);
 
-semester.SetUddannelseslinje(uddannelsesLinje);
+uddannelsesLinje = null;
+bool exitLoop = false;
+
+while (!exitLoop)
+{
+    Console.WriteLine("Ønsker du at angive en kort beskrivelse til uddannelses linjen?");
+    Console.WriteLine("1: Ja.");
+    Console.WriteLine("2: Nej.");
+    Console.Write("Vælg 1 eller 2: ");
+
+    var choice = Console.ReadKey();
+
+    switch (choice.Key)
+    {
+        case ConsoleKey.D1:
+            Console.WriteLine();
+            Console.WriteLine("Angiv kort beskrivelse af uddannelseslinjen");
+            semester.UddannelsesLinjeBeskrivelse = Console.ReadLine();
+            exitLoop = true;
+            break;
+        case ConsoleKey.D2:
+            exitLoop = true;
+            break;
+        default:
+            Console.WriteLine("Indtaastede format er forkert. Prøv igen.");
+            break;
+    }   
+}
 
 Console.Clear();
 
@@ -48,12 +75,25 @@ Validation v = new Validation();
 while (true)
 {
     Console.Clear();
-    Console.ForegroundColor = ConsoleColor.Green;
-    Console.WriteLine("---------------------------------------");
-    Console.WriteLine($"{semester.SchoolName}, {semester.UddannelsesLinje}, {semester.SemesterNavn} fag tilmelding app");
-    Console.WriteLine("---------------------------------------");
-    Console.ForegroundColor = ConsoleColor.White;
-
+    if (semester.UddannelsesLinjeBeskrivelse != null)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("---------------------------------------");
+        Console.WriteLine($"{semester.SchoolName}, {semester.UddannelsesLinje}, {semester.SemesterNavn} fag tilmelding app");
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"[{semester.UddannelsesLinjeBeskrivelse}]");
+        Console.WriteLine("---------------------------------------");
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("---------------------------------------");
+        Console.WriteLine($"{semester.SchoolName}, {semester.UddannelsesLinje}, {semester.SemesterNavn} fag tilmelding app");
+        Console.WriteLine("---------------------------------------");
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+    
     //a = søgeresultat
     List<Enrollment> listEleverDisplay = listEnrollment.Where(a => a.FagId == 1).ToList();
     Console.WriteLine($"{listEleverDisplay.Count()} Elever i grundlæggende programmering");
@@ -65,36 +105,38 @@ while (true)
     Console.WriteLine($"{listEleverDisplay.Count()} Elever i studieteknik");
     Console.WriteLine("---------------------------------------");
 
+    if (errorMessage != null)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine($"{errorMessage}");
+        Console.ForegroundColor = ConsoleColor.White;
+    }
+
+    //nulstiller errorMessage
+    errorMessage = null;
+
     Console.WriteLine();
     foreach (Enrollment displayInformation in listEnrollment)
     {
-        CourseModel displayFag = listCourses.FirstOrDefault(a => a.Id == displayInformation.Id);
-        StudentModel displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.Id);
+        CourseModel? displayFag = listCourses.FirstOrDefault(a => a.Id == displayInformation.Id);
+        StudentModel? displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.Id);
 
-        Console.ForegroundColor = ConsoleColor.Red;
-        if (errorMessage != null)
-        {
-            Console.WriteLine($"{errorMessage}");
-        }
-        Console.ForegroundColor = ConsoleColor.White;
-        //nulstiller errorMessage
-        errorMessage = null;
-        
         if (displayElev != null && displayFag != null)
             Console.WriteLine($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Course}");
     }
+
     Console.WriteLine("---------------------------------------");
 
     bool succes = false;
     while (!succes)
     {
         Console.WriteLine("Indtast FagID");
-        string FagID = Console.ReadLine();
+        string? FagID = Console.ReadLine();
         succes = v.ValidationCourse(FagID, listCourses);
         if (succes)
         {
             Console.WriteLine("Indtast ElevID");
-            string ElevID = Console.ReadLine();
+            string? ElevID = Console.ReadLine();
 
             succes = v.ValidationStudent(ElevID, listStudents);
             if (succes)
