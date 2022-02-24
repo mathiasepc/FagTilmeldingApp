@@ -141,23 +141,20 @@ namespace FagTilmeldingApp.Codes
                 con.Open();
 
                 SqlCommand command = null;
-                if (courseId == 2)
-                {
-                    command = new($"SELECT COUNT(*) FROM Klasse WHERE FagID = 2", con);
-                    using SqlDataReader reader = command.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        int rawsCount = reader.GetInt32(0);
-                        if (rawsCount == 3)
-                        {
-                            //en custom error. Dvs. en fejl som du selv laver i programmet. Da der er 'new Exception' parser jeg en besked ind i min catch. 
-                            //som så bliver min try i stedet.
-                            throw new Exception("Maks 3 elever kan være tilmeldt database programmering.");
-                        }
-                        reader.Close();
-                    }
-                }
 
+                command = new($"SELECT COUNT(*) FROM Klasse WHERE FagID = 2", con);
+                using SqlDataReader reader = command.ExecuteReader();
+                if (reader.Read())
+                {
+                    int rawsCount = reader.GetInt32(0);
+                    if (rawsCount == 3)
+                    {
+                        //en custom error. Dvs. en fejl som du selv laver i programmet. Da der er 'new Exception' parser jeg en besked ind i min catch. 
+                        //som så bliver min try i stedet.
+                        throw new Exception("Maks 3 elever kan være tilmeldt database programmering.");
+                    }
+                    reader.Close();
+                }
                 command = new($"INSERT INTO Klasse VALUES ({courseId}, {studentId})", con);
                 command.ExecuteNonQuery();
             }
