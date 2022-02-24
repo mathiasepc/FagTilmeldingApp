@@ -1,28 +1,17 @@
-﻿
-string errorMessage = null;
+﻿AdoHandler adoHandler = new();
 
-List<TeacherModel> listTeachers = new()
-{
-    new TeacherModel() { Id = 1, FirstName = "Niels", LastName = "Henriksen" },
-    new TeacherModel() { Id = 2, FirstName = "Michael", LastName = "Thomasen" },
-    new TeacherModel() { Id = 3, FirstName = "Klaus", LastName = "Pedersen" }
-};
+adoHandler.DeleteAllInEnrollment(SkoleInfo.Klasse);
 
-List<CourseModel> listCourses = new()
-{
-    new CourseModel() { Id = 1, Course = "Grundlæggende programmering" },
-    new CourseModel() { Id = 2, Course = "Database programmering" },
-    new CourseModel() { Id = 3, Course = "Studieteknik" }
-};
-List<StudentModel> listStudents = new()
-{
-    new StudentModel() { Id = 1, FirstName = "Martin", LastName = "Jensen" },
-    new StudentModel() { Id = 2, FirstName = "Patrik", LastName = "Nielsen" },
-    new StudentModel() { Id = 3, FirstName = "Susanne", LastName = "Hansen" },
-    new StudentModel() { Id = 4, FirstName = "Thomas", LastName = "Olsen" }
-};
+string? errorMessage = null;
 
+//opretter mine lister og linker det til min SQL server - link med ADO
+List<TeacherModel> listTeachers = adoHandler.GetTeachers(SkoleInfo.Lærer);
+List<CourseModel> listCourses = adoHandler.GetCourses(SkoleInfo.Fag);
+List<StudentModel> listStudents = adoHandler.GetStudents(SkoleInfo.Elev);
+
+//opretter min Enrollment List
 List<Enrollment> listEnrollment = new();
+
 
 Console.WriteLine("Angiv skole?");
 
@@ -63,7 +52,7 @@ while (!exitLoop)
             exitLoop = true;
             break;
         default:
-            Console.WriteLine("Indtaastede format er forkert. Prøv igen.");
+            Console.WriteLine("Indtastede format er forkert. Prøv igen.");
             break;
     }   
 }
@@ -75,13 +64,16 @@ Validation v = new Validation();
 while (true)
 {
     Console.Clear();
+
+    listEnrollment = adoHandler.GetEnrollment(SkoleInfo.Klasse);
+
     if (semester.UddannelsesLinjeBeskrivelse != null)
     {
         Console.ForegroundColor = ConsoleColor.Green;
         Console.WriteLine("---------------------------------------");
         Console.WriteLine($"{semester.SchoolName}, {semester.UddannelsesLinje}, {semester.SemesterNavn} fag tilmelding app");
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"[{semester.UddannelsesLinjeBeskrivelse}]");
+        Console.WriteLine($"[ {semester.UddannelsesLinjeBeskrivelse} ]");
         Console.WriteLine("---------------------------------------");
         Console.ForegroundColor = ConsoleColor.White;
     }
@@ -112,14 +104,15 @@ while (true)
         Console.ForegroundColor = ConsoleColor.White;
     }
 
-    //nulstiller errorMessage
+    //nulstiller errormessage
     errorMessage = null;
 
     Console.WriteLine();
+    
     foreach (Enrollment displayInformation in listEnrollment)
     {
-        CourseModel? displayFag = listCourses.FirstOrDefault(a => a.Id == displayInformation.Id);
-        StudentModel? displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.Id);
+        CourseModel? displayFag = listCourses.FirstOrDefault(a => a.Id == displayInformation.FagId);
+        StudentModel? displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.ElevId);
 
         if (displayElev != null && displayFag != null)
             Console.WriteLine($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Course}");
@@ -149,8 +142,9 @@ while (true)
                 }
                 else
                 {
-                    //tilføjer svaret til min liste.
-                    listEnrollment.Add(new Enrollment() { Id = listEnrollment.Count() + 1, FagId = v.FagID, ElevId = v.ElevID });
+                    //tilføjer svaret til min Database.
+                    adoHandler.InsertEnrollment(v.ElevID, v.FagID);
+                    errorMessage = adoHandler.ErrorMessage;
                 }
             }
             else

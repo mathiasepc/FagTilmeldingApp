@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FagTilmeldingApp.Codes
+namespace FagTilmeldingApp.Codes.Models
 {
-    internal class TeacherModel
+    internal class StudentModel
     {
         public int Id { get; set; }
         public string? FirstName { get; set; }
