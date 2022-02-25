@@ -12,14 +12,14 @@ namespace FagTilmeldingApp.Codes
         public int FagID { get; set; }
         public int ElevID { get; set; }
         public string? ErrorMessage { get; set; }   
-        public bool ValidationCourse(string fagID, List<CourseModel> listCourses)
+        public bool ValidationFag(string fagID, List<Fag> fag)
         {
             bool succes = int.TryParse(fagID, out int result);
             if (!succes)
                ErrorMessage = "Det indtastede fagID er forkert format.";
             else
             {
-                CourseModel? fagId = listCourses.FirstOrDefault(a => a.Id == result);
+                Fag? fagId = fag.FirstOrDefault(a => a.Id == result);
                 // eksistere id ikke.
                 if (fagId == null)
                 {
@@ -33,14 +33,14 @@ namespace FagTilmeldingApp.Codes
             }   
             return succes;
         }
-        public bool ValidationStudent(string elevID, List<StudentModel> listStudents)
+        public bool ValidationElever(string elevID, List<Elever> elever)
         {
             bool succes = int.TryParse(elevID, out int result);
             if (!succes)
                  ErrorMessage = "Det indtastede elevID er forkert format";
             else
             {
-                StudentModel? studentId = listStudents.FirstOrDefault(a => a.Id == result);
+                Elever? studentId = elever.FirstOrDefault(a => a.Id == result);
                 // Hvis ingen match er, eksistere id ikke.
                 if (studentId == null)
                 {
@@ -54,12 +54,12 @@ namespace FagTilmeldingApp.Codes
             }            
             return succes;
         }
-        public bool EnrollmentValidation(List<Enrollment> listEnrollment)
+        public bool ValidationKlasse(List<Klasse> klasse)
         {
             bool succes = true;
-            Enrollment? enrollmentID = listEnrollment.FirstOrDefault(a => a.FagId == FagID && a.ElevId ==ElevID);
+            Klasse? klasseID = klasse.FirstOrDefault(a => a.FagId == FagID && a.ElevId ==ElevID);
             
-            if(enrollmentID != null)
+            if(klasseID != null)
             {
                 succes = false;
             }            

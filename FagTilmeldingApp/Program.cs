@@ -1,16 +1,16 @@
-﻿AdoHandler adoHandler = new();
+﻿EntityFrameworkHandler em = new();
 
-adoHandler.DeleteAllInEnrollment(SkoleInfo.Klasse);
+em.ClearKlasse();
 
 string? errorMessage = null;
 
-//opretter mine lister og linker det til min SQL server - link med ADO
-List<TeacherModel> listTeachers = adoHandler.GetTeachers(SkoleInfo.Lærer);
-List<CourseModel> listCourses = adoHandler.GetCourses(SkoleInfo.Fag);
-List<StudentModel> listStudents = adoHandler.GetStudents(SkoleInfo.Elev);
+//opretter mine lister og linker det til min SQL server - link med Entity
+List<Elever> elever = em.GetElever();
+List<Fag> fag = em.GetFag();
+List<Lærer> lærer = em.GetLærer();
 
-//opretter min Enrollment List
-List<Enrollment> listEnrollment = new();
+//opretter min Klasse list
+List<Klasse> klasse = em.GetKlasse();
 
 
 Console.WriteLine("Angiv skole?");
@@ -65,7 +65,7 @@ while (true)
 {
     Console.Clear();
 
-    listEnrollment = adoHandler.GetEnrollment(SkoleInfo.Klasse);
+    klasse = em.GetKlasse();
 
     if (semester.UddannelsesLinjeBeskrivelse != null)
     {
@@ -87,13 +87,13 @@ while (true)
     }
     
     //a = søgeresultat
-    List<Enrollment> listEleverDisplay = listEnrollment.Where(a => a.FagId == 1).ToList();
+    List<Klasse> listEleverDisplay = klasse.Where(a => a.FagId == 1).ToList();
     Console.WriteLine($"{listEleverDisplay.Count()} Elever i grundlæggende programmering");
 
-    listEleverDisplay = listEnrollment.Where(a => a.FagId == 2).ToList();
+    listEleverDisplay = klasse.Where(a => a.FagId == 2).ToList();
     Console.WriteLine($"{listEleverDisplay.Count()} Elever i database programmering");
 
-    listEleverDisplay = listEnrollment.Where(a => a.FagId == 3).ToList();
+    listEleverDisplay = klasse.Where(a => a.FagId == 3).ToList();
     Console.WriteLine($"{listEleverDisplay.Count()} Elever i studieteknik");
     Console.WriteLine("---------------------------------------");
 
@@ -109,13 +109,13 @@ while (true)
 
     Console.WriteLine();
     
-    foreach (Enrollment displayInformation in listEnrollment)
+    foreach (Klasse displayInformation in klasse)
     {
-        CourseModel? displayFag = listCourses.FirstOrDefault(a => a.Id == displayInformation.FagId);
-        StudentModel? displayElev = listStudents.FirstOrDefault(a => a.Id == displayInformation.ElevId);
+        Fag? displayFag = fag.FirstOrDefault(a => a.Id == displayInformation.FagId);
+        Elever? displayElev = elever.FirstOrDefault(a => a.Id == displayInformation.ElevId);
 
         if (displayElev != null && displayFag != null)
-            Console.WriteLine($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Course}");
+            Console.WriteLine($"{displayElev.FirstName} {displayElev.LastName} er tilmeldt {displayFag.Fag1}");
     }
 
     Console.WriteLine("---------------------------------------");
@@ -125,16 +125,16 @@ while (true)
     {
         Console.WriteLine("Indtast FagID");
         string? FagID = Console.ReadLine();
-        succes = v.ValidationCourse(FagID, listCourses);
+        succes = v.ValidationFag(FagID, fag);
         if (succes)
         {
             Console.WriteLine("Indtast ElevID");
             string? ElevID = Console.ReadLine();
 
-            succes = v.ValidationStudent(ElevID, listStudents);
+            succes = v.ValidationElever(ElevID, elever);
             if (succes)
             {
-                succes = v.EnrollmentValidation(listEnrollment);
+                succes = v.ValidationKlasse(klasse);
                 if (!succes)
                 {
                     errorMessage = "Eksistere allerede.";
@@ -143,8 +143,8 @@ while (true)
                 else
                 {
                     //tilføjer svaret til min Database.
-                    adoHandler.InsertEnrollment(v.ElevID, v.FagID);
-                    errorMessage = adoHandler.ErrorMessage;
+                    em.InsertKlasse(v.ElevID, v.FagID);
+                    errorMessage = em.ErrorMessage;
                 }
             }
             else
